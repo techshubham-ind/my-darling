@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adity: My Infinite Nebula</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Dancing+Script:wght@700&family=Quicksand:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glow: #ff758f;
+            --deep: #12002f;
+            --accent: #ff0055;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--deep);
+            color: white;
+            font-family: 'Quicksand', sans-serif;
+            overflow: hidden; /* No scroll, everything is interactive 3D */
+            height: 100vh;
+        }
+
+        #canvas-bg { position: fixed; inset: 0; z-index: 1; }
+
+        /* Cinematic Lock */
+        #lock-screen {
+            position: fixed; inset: 0; z-index: 10000;
+            background: radial-gradient(circle at center, #1a0033 0%, #000 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 2.5s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+        #lock-screen.dissolve { opacity: 0; pointer-events: none; filter: blur(20px); transform: scale(1.5); }
+
+        .lock-content h1 { font-family: 'Cinzel'; letter-spacing: 12px; font-size: 2rem; color: var(--glow); text-shadow: 0 0 15px var(--glow); }
+        .lock-input {
+            background: transparent; border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 30px; border-radius: 50px; color: white; text-align: center;
+            width: 250px; outline: none; transition: 0.3s; margin: 30px 0;
+        }
+        .lock-input:focus { border-color: var(--glow); box-shadow: 0 0 20px var(--glow); }
+
+        /* The Kinetic Gallery */
+        #universe { position: absolute; inset: 0; z-index: 5; display: none; perspective: 1000px; }
+        
+        .floating-memoir {
+            position: absolute; width: 220px; aspect-ratio: 1/1;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px); border-radius: 20px; padding: 10px;
+            cursor: pointer; transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        .floating-memoir img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+        .floating-memoir:hover { border-color: var(--glow); box-shadow: 0 0 30px var(--glow); z-index: 100 !important; }
+
+        /* 100 Star Pop-ups */
+        .star {
+            position: absolute; background: white; border-radius: 50%;
+            cursor: pointer; z-index: 2; transition: 0.3s;
+        }
+        .star:hover { background: var(--accent); transform: scale(3); box-shadow: 0 0 15px var(--accent); }
+
+        /* Heart Pulse Effect */
+        #pulse-heart {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            font-size: 15rem; color: var(--accent); opacity: 0; z-index: 10;
+            pointer-events: none; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Letter Reveal */
+        #locket-btn {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 100; background: var(--glow); color: white; border: none;
+            padding: 15px 40px; border-radius: 50px; cursor: pointer; display: none;
+            font-family: 'Cinzel'; font-weight: bold; box-shadow: 0 0 20px rgba(255,117,143,0.5);
+        }
+
+        .letter-modal {
+            position: fixed; inset: 0; z-index: 1001; background: rgba(0,0,0,0.9);
+            display: none; align-items: center; justify-content: center; padding: 20px;
+        }
+        .letter-content {
+            background: #fffafa; color: #333; padding: 50px; border-radius: 5px;
+            max-width: 500px; text-align: center; border: 5px double var(--glow);
+        }
+        .letter-content h2 { font-family: 'Dancing Script'; font-size: 3rem; color: var(--accent); }
+        .letter-content p { font-size: 1.2rem; line-height: 1.6; font-style: italic; }
+
+        .shubham-signature { position: fixed; bottom: 10px; right: 20px; font-size: 0.7rem; color: rgba(255,255,255,0.2); letter-spacing: 2px; }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-bg"></canvas>
+    <div id="pulse-heart">❤️</div>
+
+    <div id="lock-screen">
+        <div class="lock-content" style="text-align: center;">
+            <p style="letter-spacing: 5px; font-size: 0.8rem; margin-bottom: 0;">2026 NEW YEAR PREMIERE</p>
+            <h1>ADITY'S SPACE</h1>
+            <input type="password" id="pass" class="lock-input" placeholder="Type: adity">
+            <br>
+            <button onclick="unlock()" style="background:var(--glow); border:none; color:white; padding:12px 40px; border-radius:50px; cursor:pointer;">Initiate Love</button>
+        </div>
+    </div>
+
+    <div id="universe"></div>
+
+    <button id="locket-btn" onclick="openLetter()">Open My 2026 Vow</button>
+
+    <div class="letter-modal" id="modal" onclick="closeLetter()">
+        <div class="letter-content" onclick="event.stopPropagation()">
+            <h2>Dearest Adity,</h2>
+            <p>
+                In this vast universe, you are my favorite point of light. As we enter 2026, I wanted to build you something that feels as infinite as my love for you. <br><br>
+                These photos are the orbits of my world. Every star you see here represents a wish I have for us this year. <br><br>
+                Happy New Year, my Queen. <br><br>
+                — Shubham Mahato
+            </p>
+            <button onclick="closeLetter()" style="margin-top:20px; cursor:pointer; padding:10px 20px;">Return to Galaxy</button>
+        </div>
+    </div>
+
+    <div class="shubham-signature">DESIGNED BY SHUBHAM MAHATO</div>
+
+    <script>
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let width, height, stars = [];
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            for(let i=0; i<150; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#0a001a';
+            ctx.fillRect(0,0,width,height);
+            ctx.fillStyle = 'white';
+            stars.forEach(s => {
+                s.y -= s.speed;
+                if(s.y < 0) s.y = height;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI*2);
+                ctx.fill();
+            });
+            requestAnimationFrame(draw);
+        }
+
+        function unlock() {
+            if(document.getElementById('pass').value.toLowerCase() === 'adity') {
+                document.getElementById('lock-screen').classList.add('dissolve');
+                document.getElementById('universe').style.display = 'block';
+                document.getElementById('locket-btn').style.display = 'block';
+                initUniverse();
+                initStarPopups();
+            }
+        }
+
+        function initUniverse() {
+            const container = document.getElementById('universe');
+            for(let i=1; i<=26; i++) {
+                const card = document.createElement('div');
+                card.className = 'floating-memoir';
+                // Randomly scattering in 3D space
+                const x = Math.random() * (width - 250);
+                const y = Math.random() * (height - 250);
+                const z = Math.random() * 400 - 200;
+                card.style.left = x + 'px';
+                card.style.top = y + 'px';
+                card.style.transform = `translateZ(${z}px) rotate(${Math.random()*20-10}deg)`;
+                
+                card.innerHTML = `<img src="img${i}.png" alt="Memory">`;
+                
+                // Parallax effect on mouse move
+                window.addEventListener('mousemove', (e) => {
+                    const moveX = (e.clientX - width/2) / 25;
+                    const moveY = (e.clientY - height/2) / 25;
+                    card.style.transform = `translateZ(${z}px) translate(${moveX}px, ${moveY}px) rotate(${Math.random()*10}deg)`;
+                });
+
+                container.appendChild(card);
+            }
+        }
+
+        function initStarPopups() {
+            for(let i=0; i<100; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const size = Math.random() * 4 + 2;
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                s.style.left = Math.random() * 100 + 'vw';
+                s.style.top = Math.random() * 100 + 'vh';
+                
+                s.onclick = () => {
+                    const heart = document.getElementById('pulse-heart');
+                    heart.style.scale = '1';
+                    heart.style.opacity = '0.8';
+                    setTimeout(() => { heart.style.scale = '0'; heart.style.opacity = '0'; }, 700);
+                };
+                document.body.appendChild(s);
+            }
+        }
+
+        function openLetter() { document.getElementById('modal').style.display = 'flex'; }
+        function closeLetter() { document.getElementById('modal').style.display = 'none'; }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        draw();
+    </script>
+</body>
+</html>
